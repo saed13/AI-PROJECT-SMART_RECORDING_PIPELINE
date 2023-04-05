@@ -23,27 +23,27 @@ Tasks
 
 Task 1
 
-Build detection:
-Pose estimation:
-Trajectory estimation/prediction:
+Build detection,
+Pose estimation,
+Trajectory estimation/prediction
 
 Task 2
 
-Lane detection:
-Road markings detection:
-Street sign detection:
-Traffic light detection:
+Lane detection,
+Road markings detection,
+Street sign detection,
+Traffic light detection,
 
 Task 3
 
-Model for Highlevel description/representation of scenes to ease the classification:
-Grouping and identification of scenes for humans:
+Model for Highlevel description/representation of scenes to ease the classification,
+Grouping and identification of scenes for humans
 
 Task 4
 
-Model for identifying traffic rule violations:
+Model for identifying traffic rule violations
 
 Task 5:
 
-Identification of potentialy dangerous situations:
+Identification of potentialy dangerous situations
 
