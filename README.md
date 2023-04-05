@@ -9,3 +9,5 @@
 |     Shpineva Polina      |   ICT                                    |   yes                        |                           |
 |     Kostennikov Danil    |   ICS                                    |   yes                        |                           |
 |     Saed Abed            |   AI-6                                   |   no                         |                           |
+|     Javier Górriz        |   ICS                                    |   yes                        |                           |
+|     Roberto Rivas        |   ICS                                    |   yes                        |                           |
