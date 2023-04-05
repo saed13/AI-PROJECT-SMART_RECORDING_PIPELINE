@@ -15,35 +15,34 @@
 
 
 
-The main focus should be on the first 2 tasks. Only after completing them, we can start working on the remaining tasks.
+## The main focus should be on the first 2 tasks. Only after completing them, we can start working on the remaining tasks.
 
 
+## Tasks
 
-Tasks
+### Task 1
 
-Task 1
-
-Build detection,
-Pose estimation,
+Build detection <br>
+Pose estimation <br>
 Trajectory estimation/prediction
 
-Task 2
+### Task 2
 
-Lane detection,
-Road markings detection,
-Street sign detection,
-Traffic light detection,
+Lane detection <br>
+Road markings detection <br>
+Street sign detection <br>
+Traffic light detection 
 
-Task 3
+### Task 3
 
-Model for Highlevel description/representation of scenes to ease the classification,
+Model for Highlevel description/representation of scenes to ease the classification <br>
 Grouping and identification of scenes for humans
 
-Task 4
+### Task 4
 
 Model for identifying traffic rule violations
 
-Task 5:
+### Task 5:
 
 Identification of potentialy dangerous situations
 
