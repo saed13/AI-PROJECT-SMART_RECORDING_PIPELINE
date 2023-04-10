@@ -6,7 +6,7 @@
 |     Lamard Arthur        |   ICS                                    |   yes                        |                           |
 |     Sanamjeet Meyer      |   AI 6                                   |   no                         |                           |
 |     Serife-Nur  Özdemir  |   AI 6                                   |   no                         |                           |
-|     Shpineva Polina      |   ICT                                    |   yes                        |                           |
+|     Shpineva Polina      |   ICS                                    |   yes                        |                           |
 |     Kostennikov Danil    |   ICS                                    |   yes                        |                           |
 |     Saed Abed            |   AI-6                                   |   no                         |                           |
 |     Javier Górriz        |   ICS                                    |   yes                        |                           |
