@@ -11,7 +11,7 @@
 |     Saed Abed            |   AI-6                                   |   no                         |                           |
 |     Javier Górriz        |   ICS                                    |   yes                        |                           |
 |     Roberto Rivas        |   ICS                                    |   yes                        |                           |
-
+|     Alexander Shunyaev   |   ICS                                    |   yes                        |                           |
 
 
 
