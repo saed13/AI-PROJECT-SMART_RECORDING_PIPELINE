@@ -2,6 +2,8 @@ import numpy as np
 import numpy.linalg as la
 import os.path
 import cv2
+import pybboxes as pbx
+import matplotlib.pyplot as plt
 EPSILON = 1e-10
 
 def get_axes_of_a_view(view):
@@ -78,11 +80,11 @@ def transform_from_to(src, target):
 def project_lidar_from_to(lidar, src_view, target_view):
     lidar = dict(lidar)
     trans = transform_from_to(src_view, target_view)
-    points = lidar['pcloud_points']
+    points = lidar['points']
     points_hom = np.ones((points.shape[0], 4))
     points_hom[:, 0:3] = points
     points_trans = (np.dot(trans, points_hom.T)).T
-    lidar['pcloud_points'] = points_trans[:,0:3]
+    lidar['points'] = points_trans[:,0:3]
 
     return lidar
 
@@ -193,3 +195,51 @@ def projectPoints(points, camMtx, dist):
                       np.asarray(dist))
     pixel_coords = pixel_coords.squeeze()
     return pixel_coords
+
+def get_bboxes_coords(image):
+    im = cv2.imread(image)
+    yolo_bbox ='/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/test/labels/20181108123750_camera_frontcenter_000005238.txt'
+
+    #pbx.convert_bbox(yolo_bbox1, from_type="yolo", to_type="voc", image_size=(W, H))
+    img = cv2.imread( image)
+    dh, dw, _ = img.shape
+
+    fl = open( yolo_bbox, 'r')
+    data = fl.readlines()
+    fl.close()
+
+    for dt in data:
+
+        # Split string to float
+        _, x, y, w, h = map(float, dt.split(' '))
+
+        # Taken from https://github.com/pjreddie/darknet/blob/810d7f797bdb2f021dbe65d2524c2ff6b8ab5c8b/src/image.c#L283-L291
+        # via https://stackoverflow.com/questions/44544471/how-to-get-the-coordinates-of-the-bounding-box-in-yolo-object-detection#comment102178409_44592380
+        l = int((x - w / 2) * dw)
+        r = int((x + w / 2) * dw)
+        t = int((y - h / 2) * dh)
+        b = int((y + h / 2) * dh)
+
+        if l < 0:
+            l = 0
+        if r > dw - 1:
+            r = dw - 1
+        if t < 0:
+            t = 0
+        if b > dh - 1:
+            b = dh - 1
+
+        cv2.rectangle(img, (l, t), (r, b), (0, 0, 255), 10)
+        final_coord = ([l,t],[r,b])
+        print(final_coord)
+        return final_coord
+
+
+    plt.imshow(img)
+    plt.show()
+
+if __name__ == "__main__":
+    file_name_lidar = "/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/test/20181108_123750/lidar/cam_front_center/20181108123750_lidar_frontcenter_000005238.npz"
+    file_name_image = extract_image_file_name_from_lidar_file_name(file_name_lidar)
+
+    print(get_bboxes_coords(file_name_image))
