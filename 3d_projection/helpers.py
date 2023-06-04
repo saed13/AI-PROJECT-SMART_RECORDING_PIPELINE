@@ -2,7 +2,7 @@ import numpy as np
 import numpy.linalg as la
 import os.path
 import cv2
-import pybboxes as pbx
+from pathlib import Path
 import matplotlib.pyplot as plt
 EPSILON = 1e-10
 
@@ -197,8 +197,16 @@ def projectPoints(points, camMtx, dist):
     return pixel_coords
 
 def get_bboxes_coords(image):
-    im = cv2.imread(image)
-    yolo_bbox ='/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/test/labels/20181108123750_camera_frontcenter_000005238.txt'
+    label_path_file = '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/test/labels/'
+    png_name = os.path.basename(os.path.normpath(image))
+    print(png_name)
+    txt_path = str(png_name)
+    final_extension = txt_path.replace('.png', '.txt')
+    print(final_extension)
+    final_path = os.path.join(label_path_file, final_extension)
+    print(final_path)
+
+    yolo_bbox = final_path
 
     #pbx.convert_bbox(yolo_bbox1, from_type="yolo", to_type="voc", image_size=(W, H))
     img = cv2.imread( image)
@@ -231,7 +239,7 @@ def get_bboxes_coords(image):
 
         cv2.rectangle(img, (l, t), (r, b), (0, 0, 255), 10)
         final_coord = ([l,t],[r,b])
-        print(final_coord)
+        print("final coord : ",final_coord)
         return final_coord
 
 
@@ -239,7 +247,7 @@ def get_bboxes_coords(image):
     plt.show()
 
 if __name__ == "__main__":
-    file_name_lidar = "/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/test/20181108_123750/lidar/cam_front_center/20181108123750_lidar_frontcenter_000005238.npz"
+    file_name_lidar = "/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/test/20181108_123750/lidar/cam_front_center/20181108123750_lidar_frontcenter_000005591.npz"
     file_name_image = extract_image_file_name_from_lidar_file_name(file_name_lidar)
 
-    print(get_bboxes_coords(file_name_image))
+    get_bboxes_coords(file_name_image)
