@@ -28,11 +28,6 @@ export PYTHONPATH="${PYTHONPATH}:/home/sa13291/Documents/ARTHUR_LAMARD"
 
 """
 
-#subprocess.run([export PYTHONPATH="${PYTHONPATH}:/home/sa13291/Documents/ARTHUR_LAMARD"])
-
-'''currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)'''
 '''with open(
         '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/camera_lidar_semantic_bboxes/cams_lidar.json',
         'r') as f:'''
@@ -81,6 +76,8 @@ file_name_lidar = ["/home/sa13291/Documents/ARTHUR_LAMARD/local_test/camera_lida
 #file_name_lidar = ["/home/sa13291/Documents/ARTHUR_LAMARD/local_test/camera_lidar_semantic_bboxes/test/20181108_123750/lidar/cam_front_center/20181108123750_lidar_frontcenter_000007350.npz"]
 
 project_path = "/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction/"
+
+# Remove the csv file if exists
 if os.path.exists(str(project_path + 'results_pipeline.csv')):
     os.remove(str(project_path + 'results_pipeline.csv'))
     print("!!!!!!!!!!!!!!!!results_pipeline deleted!!!!!!!!!!!!!!!!!!!!!")
@@ -102,9 +99,6 @@ for i in range(len(file_name_lidar)):
                      linewidth=1, edgecolor='b', facecolor='none')
     lidar_fc_in_camfc = np.load(file_name_lidar[i])
 
-    #print("lidar_path : ", lidar_fc_in_camfc)
-    print("file_name_lidar[i] : ", file_name_lidar[i])
-# print("file name lidar : ",(list(lidar_fc_in_camfc.keys())))
     ax1.add_patch(rect)
     lidar_fc_in_global = project_lidar_from_to(lidar_fc_in_camfc, cam_fc_view, vehicle_view)
 
@@ -117,10 +111,7 @@ for i in range(len(file_name_lidar)):
     ax1.scatter(*pseudo_objects.T, s=0.1, c='y')
     # image
     file_name_image = extract_image_file_name_from_lidar_file_name(file_name_lidar[i])
-    print("file_name_image : ", file_name_image)
     img = plt.imread(file_name_image)
-
-    #get_bboxes_coords(file_name_image)
 
     undist_img = undistort_image(img, 'front_center', config)
     undistorted_params = np.array([[0., 0., 0., 0., 0.]])
@@ -159,6 +150,8 @@ for i in range(len(file_name_lidar)):
                       project='/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction/prediction_cars',
                       nosave=False,
                       )"""
+
+    # detect everything using the models
     traffic_signs = detect.run(weights="/home/sa13291/Documents/ARTHUR_LAMARD/traffic_sign/best.pt",
                                          source=file_name_image,
                                          save_conf=True,
@@ -186,24 +179,18 @@ for i in range(len(file_name_lidar)):
     #                                  config['cameras']['front_center']['Distortion'])
 
 
-    #print("****************** lane detect : ", lane_detect)
-
     ax2.scatter(*pixel_coords.T, s=0.2, color=cm.rainbow(1 - depths / 40))
 
     # gather 3d position.
-    print("file_name_image : ", file_name_image)
     coord_list = get_bboxes_coords(file_name_image)
     '''coord_list = detect.run(weights="/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/YOLOPv2/data/weights/yolopv2.pt",
                             source=file_name_image,
     
                             )'''
     #print("coord_list : ", len(coord_list))
-    bbx_coord = []
-    bbx_coord.append(coord_list[0])
-    print("bbx_coords", bbx_coord)
+
+    # get the coordinates in the saved files
     for (k, j) in zip((coord_list[0]), (coord_list[1])):
-        # print(i)
-        # print("bbx_coord : ", bbx_coord)
         print("coord_list : ", coord_list[0])
         bounding_box_2d = np.array(k)  # top left -> bottom right.
         center = np.mean(bounding_box_2d, axis=0)
@@ -217,6 +204,7 @@ for i in range(len(file_name_lidar)):
                                  np.diff(bounding_box_2d[:, 1]),
                                  linewidth=1, edgecolor='r', facecolor='none')
         ax2.add_patch(bounding_box)
+        # write the csv file with every trucks prositons
         file_writer(k,truck_position, j)
 
         '''im0 = lane_detect[1]
@@ -266,10 +254,10 @@ for i in range(len(file_name_lidar)):
 
     list_of_file = glob.glob(str(label_path_file + '*/'))
     latest_file = max(list_of_file, key=os.path.getctime)
-    #print("latest file : ", latest_file)
-    #plt.savefig(os.path.join((latest_file), 'results.png'))
+    # save the last png results
     plt.savefig(os.path.join((label_path_file), f'results{i}.png'), dpi = 300)
     fig.show()
     plt.show()
 
+    # detect the anomaly
     #anomaly_detection()

@@ -215,6 +215,7 @@ def projectPoints(points, camMtx, dist):
 
 
 def join_txt(list_file: list):
+    # create a uniq txt file from a list a txt files
     prediction_file = '/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction/results_label.txt'
     # prediction_file = '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/3d_projection/prediction/results_label.txt'
     with open(prediction_file, 'w') as outfile:
@@ -228,17 +229,14 @@ def join_txt(list_file: list):
 
 
 def get_bboxes_coords(image):
-    print("IMAGE : ", image)
+    # get the normal coordinates of a bbox using the yolo format
+
     # label_path_file = '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/3d_projection/prediction/'
     label_path_file = '/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction'
     if not os.path.exists(label_path_file):
         os.mkdir(label_path_file)
 
-    # list_of_file = glob.glob(str(label_path_file + '*/*/labels/'))
-
     list_of_file = glob.glob(str(label_path_file + '*/*/*/labels/'))
-    # print("list of file == ", list_of_file)
-    # print("len(list of file) : ", len(list_of_file))
 
     '''
         Auto incrementation deactivate for the exp file -> check yolo general.py if you want to reactivate
@@ -259,10 +257,9 @@ def get_bboxes_coords(image):
     print("latest_file_cars",latest_file_cars)'''
     final_file_list = []
 
+    # try to see if any signs/traffic lights or build detected in the images
+    # read the txt file created by the yolo model if they exits
     try:
-        #print("os.path.basename(os.path.normpath('/folderA/folderB/folderC/folderD/')) : ",os.path.basename(os.path.normpath(image)))
-        #print("COUCOU : ",os.path.splitext(os.path.basename(os.path.normpath(image)))[0])
-
         latest_file_signs = glob.glob(str(list_of_file[0] + '*.txt'))
         latest_file_s = max(latest_file_signs, key=os.path.getctime)
         print("latest file : ", latest_file_s)
@@ -296,42 +293,13 @@ def get_bboxes_coords(image):
     except:
         print("INFORMATION : No traffic lights detected")
         pass
-    # print("latest_file_signs", latest_file_signs)
-    # print("latest_file_cars", latest_file_cars)
-    # print("latest_file_line", latest_file_lane)
 
-    # print("final file list :", final_file_list)
-    '''latest_file = max(list_of_file, key=os.path.getctime)
-    #print("latest file : ", latest_file)
-    png_name = os.path.basename(os.path.normpath(image))
-    print(png_name)
-    txt_path = str(png_name)
-    final_extension = txt_path.replace('.png', '.txt')
-    print(final_extension)'''
-
-    # file_signs_path = str(latest_file_signs[0])
-    # file_cars_path =str(latest_file_cars[0])
-    # file_line_path = str(latest_file_lane[0])
-    # file_signs_path = str(latest_file_signs[0])
-    # print("file_signs_path",latest_file_signs[0])
-    # print("file_cars_path",latest_file_lane[0])
-
-    # latest_file = join_txt([file_signs_path, file_cars_path])
-    '''for i in range(len(final_file_list)):
-        print("********** i *********** : ",i)
-        latest_file = join_txt(final_file_list[i])'''
-
-    # latest_file = join_txt([file_signs_path, file_line_path])
+    # create a single txt file from all the detection txt files
     latest_file = join_txt(final_file_list)
     png_name = os.path.basename(os.path.normpath(image))
-    # print(png_name)
     txt_path = str(png_name)
     final_extension = txt_path.replace('.png', '.txt')
-    # print(final_extension)
-
     final_path = latest_file
-    # print("&&&&&&&&&&& latest file : ", latest_file)
-    # print(final_path)
     yolo_bbox = final_path
 
     # pbx.convert_bbox(yolo_bbox1, from_type="yolo", to_type="voc", image_size=(W, H))
@@ -339,9 +307,7 @@ def get_bboxes_coords(image):
     dh, dw, _ = img.shape
 
     fl = open(yolo_bbox, 'r')
-    # print(yolo_bbox)
     data = fl.readlines()
-    # print("DATA  :",len(data))
     fl.close()
 
     '''data = detect.run(weights="/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/local_test/yolov5/yolov5s.pt",
@@ -352,6 +318,7 @@ def get_bboxes_coords(image):
 
     final_coord_list = []
     conf_list = []
+    # conver the yolo coordinates to a normal format
     for dt in data:
         # print("data : ", data)
         # print("dt : ",dt)
