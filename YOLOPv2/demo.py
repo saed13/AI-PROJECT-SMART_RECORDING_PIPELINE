@@ -131,6 +131,7 @@ def detect(weights, source, project, save_txt, save_conf, exist_ok):
                 print("FILE EXIST")
                 try:
                     os.remove(f'{txt_path}_conf.txt')
+                    print("COUCOU2")
                     print(f"file{txt_path}.txt deleted")
                     print("list directory : ", os.listdir('../txt_path'))
                 except OSError as e:
@@ -166,7 +167,7 @@ def detect(weights, source, project, save_txt, save_conf, exist_ok):
 
             # Print time (inference)
             print(f'{s}Done. ({t2 - t1:.3f}s)')
-            cv2.drawContours(im0s, [polygon], -1, (0, 0, 0), 4)
+            cv2.drawContours(im0, [polygon], -1, (0, 0, 0), 4)
             show_seg_result(im0, (da_seg_mask, ll_seg_mask), is_demo=True)
 
             # Save results (image with detections)
