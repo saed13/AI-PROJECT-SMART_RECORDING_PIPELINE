@@ -228,6 +228,7 @@ def join_txt(list_file: list):
 
 
 def get_bboxes_coords(image):
+    print("IMAGE : ", image)
     # label_path_file = '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/3d_projection/prediction/'
     label_path_file = '/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction'
     if not os.path.exists(label_path_file):
@@ -259,10 +260,15 @@ def get_bboxes_coords(image):
     final_file_list = []
 
     try:
+        #print("os.path.basename(os.path.normpath('/folderA/folderB/folderC/folderD/')) : ",os.path.basename(os.path.normpath(image)))
+        #print("COUCOU : ",os.path.splitext(os.path.basename(os.path.normpath(image)))[0])
+
         latest_file_signs = glob.glob(str(list_of_file[0] + '*.txt'))
-        # print("latest file signs : ", latest_file_signs)
-        if os.path.exists(str(latest_file_signs[0])):
-            file_signs_path = str(latest_file_signs[0])
+        latest_file_s = max(latest_file_signs, key=os.path.getctime)
+        print("latest file : ", latest_file_s)
+        print("latest file signs : ", latest_file_signs)
+        if os.path.exists(str(latest_file_s)):
+            file_signs_path = str(latest_file_s)
             final_file_list.append(str(file_signs_path))
     except:
         print("INFORMATION : No traffic sign detected")
@@ -270,18 +276,22 @@ def get_bboxes_coords(image):
     # latest_file_cars = glob.glob(str(list_of_file[0] + '/*.txt'))
     try:
         latest_file_lane = glob.glob(str(list_of_file[2] + '*.txt'))
-        # print("latest file lane : ", latest_file_lane)
-        if os.path.exists(str(latest_file_lane[0])):
-            file_line_path = str(latest_file_lane[0])
+        print("latest file lane : ", latest_file_lane)
+        latest_file_la = max(latest_file_lane, key=os.path.getctime)
+        print("latest file : ", latest_file_la)
+        if os.path.exists(str(latest_file_la)):
+            file_line_path = str(latest_file_la)
             final_file_list.append(file_line_path)
     except:
         print("INFORMATION : No build detected")
         pass
     try:
         latest_file_lights = glob.glob(str(list_of_file[1] + '*.txt'))
+        latest_file_l = max(latest_file_lights, key=os.path.getctime)
+        print("latest file : ", latest_file_l)
         # print("latest file lane : ", latest_file_lights)
-        if os.path.exists(str(latest_file_lights[0])):
-            file_line_path = str(latest_file_lights[0])
+        if os.path.exists(str(latest_file_l)):
+            file_line_path = str(latest_file_l)
             final_file_list.append(file_line_path)
     except:
         print("INFORMATION : No traffic lights detected")
@@ -306,7 +316,6 @@ def get_bboxes_coords(image):
     # print("file_signs_path",latest_file_signs[0])
     # print("file_cars_path",latest_file_lane[0])
 
-    # TODO : Si le fichier n'existe pas, on ne le join pas, ca veut dire que les panneaux ou trafficlights ne sont pas detectés sur l'image
     # latest_file = join_txt([file_signs_path, file_cars_path])
     '''for i in range(len(final_file_list)):
         print("********** i *********** : ",i)
@@ -367,10 +376,11 @@ def get_bboxes_coords(image):
 
         cv2.rectangle(img, (l, t), (r, b), (0, 0, 255), 10)
         final_coord = ([l, t], [r, b])
+        print(f"image : {image}, final_coord : {final_coord}")
         final_coord_list.append(final_coord)
         conf_list.append(conf)
         # print("final coord : ",type(final_coord))
-    # print("final_coord_list : ", final_coord_list)
+    print("final_coord_list : ", final_coord_list)
     # print("confidence : ", conf_list)
     return final_coord_list, conf_list
 
@@ -404,8 +414,10 @@ def file_writer(truck, coords, conf):
 def anomaly_detection():
     projet_path = "/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/"
     projet_prediction_path = glob.glob(str(projet_path + 'prediction/'))
-    read_file = pd.read_csv((f'{projet_prediction_path[0]}results_pipeline.txt'))
-    read_file.to_csv((f'{projet_prediction_path[0]}results_pipeline.csv'))
+    read_file = pd.read_csv((f'{projet_prediction_path[0]}results_pipeline.csv'), names=["trucks", "coords", "conf"])
+    #read_file.to_csv((f'{projet_prediction_path[0]}results_pipeline.csv'))
+    print("header : ", read_file.head())
+    print(read_file)
     #file = str(projet_prediction_path[0] + 'results_pipeline.csv')
     #print(pd.read_csv(file))
     '''list_line = []
