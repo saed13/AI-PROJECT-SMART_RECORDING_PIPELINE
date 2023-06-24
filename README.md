@@ -14,35 +14,42 @@
 |     Alexander Shunyaev   |   ICS                                    |   yes                        |                           |
 
 
+## How to use the code ? 
 
-## The main focus should be on the first 2 tasks. Only after completing them, we can start working on the remaining tasks.
+If you're facing path issue while running like "the module 'local_test' does not exist" type this command in your terminal to add the project to your python paht :
+```
+export PYTHONPATH="${PYTHONPATH}:/home/sa13291/Documents/ARTHUR_LAMARD"
+```
 
+Your project's data has to have the same tree as the a2d2 dataset tree (example):
+Inside each cam_front_semantic_bboxes files you'll find specific files from the a2d2 dataset (.npz for lidar, .json/.png from camera)
+```
+📦camera_lidar_semantic_bboxes
+ ┃ ┣ 📂20181107_132300
+ ┃ ┃ ┣ 📂camera
+ ┃ ┃ ┃ ┗ 📂cam_front_center
+ ┃ ┃ ┣ 📂label
+ ┃ ┃ ┃ ┗ 📂cam_front_center
+ ┃ ┃ ┣ 📂label3D
+ ┃ ┃ ┃ ┗ 📂cam_front_center
+ ┃ ┃ ┣ 📂lidar
+ ┃ ┃ ┃ ┗ 📂cam_front_center
+ ┣ 📜cams_lidar.json
+ ┗ 📜class_list.json
+```
+## To run the code  :
+### WARNING : Do not forget to change the paths in the 3d_detection file
+version of python : 3.10.11
 
-## Tasks
-
-### Task 1
-
-Build detection <br>
-Pose estimation <br>
-Trajectory estimation/prediction
-
-### Task 2
-
-Lane detection <br>
-Road markings detection <br>
-Street sign detection <br>
-Traffic light detection 
-
-### Task 3
-
-Model for Highlevel description/representation of scenes to ease the classification <br>
-Grouping and identification of scenes for humans
-
-### Task 4
-
-Model for identifying traffic rule violations
-
-### Task 5:
-
-Identification of potentialy dangerous situations
-
+To create an environnement with conda please use the command : 
+```
+conda create --name <env> --file requirements_conda.txt
+```
+To create an environnement with pip please use the command : 
+```
+pip install -r requirements_pip.txt
+```
+Then to run the code, go to the root folder of your project and run the command : 
+```
+python 3d_projection/3d_projection.py
+```
