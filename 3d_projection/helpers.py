@@ -1,4 +1,7 @@
+import csv
 import glob
+import statistics
+
 import pandas as pd
 import numpy as np
 import numpy.linalg as la
@@ -109,7 +112,6 @@ def extract_image_file_name_from_lidar_file_name(path_lidar):
                       'camera_' + \
                       file_name_image[2] + '_' + \
                       file_name_image[3] + '.png'
-    print(file_name_image)
     return os.path.join("/".join(path_lidar[:-1] + [file_name_image]))
 
 
@@ -124,7 +126,17 @@ def extract_semantic_file_name_from_image_file_name(file_name_image):
 
     return file_name_semantic_label
 
-
+def extract_json_file_name_from_lidar_file_name(path_lidar):
+    replace_lidar = lambda x: x if x != 'lidar' else 'camera'
+    path_lidar = path_lidar.split('/')
+    path_lidar = list(map(replace_lidar, path_lidar))
+    file_name_json = path_lidar[-1].split('.')[0]
+    file_name_json = file_name_json.split('_')
+    file_name_json = file_name_json[0] + '_' + \
+                      'camera_' + \
+                      file_name_json[2] + '_' + \
+                      file_name_json[3] + '.json'
+    return os.path.join("/".join(path_lidar[:-1] + [file_name_json]))
 def undistort_image(image, cam_name, config):
     if cam_name in ['front_left', 'front_center', \
                     'front_right', 'side_left', \
@@ -181,26 +193,20 @@ def map_lidar_points_onto_image(image_orig, lidar, pixel_size=3, pixel_opacity=1
                         colours[i]) + pixel_opacity * 255 * colours[i]
     return image.astype(np.uint8)
 
-
-## taken from https://stackoverflow.com/questions/12299540/plane-fitting-to-4-or-more-xyz-points
 def planeFit(points):
-    """
-    p, n = planeFit(points)
-
-    Given an array, points, of shape (d,...)
-    representing points in d-dimensional space,
-    fit an d-dimensional plane to the points.
-    Return a point, p, on the plane (the point-cloud centroid),
-    and the normal, n.
-    """
     import numpy as np
-    points = np.reshape(points, (np.shape(points)[0], -1)).T  # Collapse trialing dimensions
+    try:
+        points = np.reshape(points, (np.shape(points)[0], -1)).T
+    except ValueError:
+        raise ValueError("Error: Unable to reshape array.")
+        # Handle the error condition appropriately or re-raise the exception
+
     assert points.shape[0] <= points.shape[1], "There are only {} points in {} dimensions.".format(points.shape[1],
                                                                                                    points.shape[0])
     ctr = points.mean(axis=1)
     x = points - ctr[:, np.newaxis]
-    M = np.dot(x, x.T)  # Could also use np.cov(x) here.
-    return ctr, la.svd(M)[0][:, -1]
+    M = np.dot(x, x.T)
+    return ctr, np.linalg.svd(M)[0][:, -1]
 
 
 def projectPoints(points, camMtx, dist):
@@ -217,11 +223,8 @@ def projectPoints(points, camMtx, dist):
 def join_txt(list_file: list):
     # create a uniq txt file from a list a txt files
     prediction_file = '/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction/results_label.txt'
-    # prediction_file = '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/3d_projection/prediction/results_label.txt'
     with open(prediction_file, 'w') as outfile:
         for fname in list_file:
-            # print("Error code:", e.code)
-            # os.remove(f'{fname}.txt')
             with open(fname) as infile:
                 for line in infile:
                     outfile.write(line)
@@ -231,7 +234,7 @@ def join_txt(list_file: list):
 def get_bboxes_coords(image):
     # get the normal coordinates of a bbox using the yolo format
 
-    # label_path_file = '/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/3d_projection/prediction/'
+    # create the prediction folder if it doesn't exist
     label_path_file = '/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction'
     if not os.path.exists(label_path_file):
         os.mkdir(label_path_file)
@@ -241,20 +244,7 @@ def get_bboxes_coords(image):
     '''
         Auto incrementation deactivate for the exp file -> check yolo general.py if you want to reactivate
     '''
-    # print("list file 0 : ",os.listdir(os.path.join((list_of_file[0])))[0])
-    # print("list_of_file[0]",str(list_of_file[0]))
-    # print("list_of_file[1]",str(list_of_file[1]))
-    # print("list_of_file[2]", str(list_of_file[2]))
 
-    # print("COUCOU : ",glob.glob(str(list_of_file[0] + '*.txt')))
-    #######################################
-    # cars = sings and line = cars+line
-    #######################################
-
-    '''latest_file_signs = os.listdir(os.path.join((list_of_file[0])))[0]
-    latest_file_cars = os.listdir(os.path.join((list_of_file[1])))[0]
-    print("latest_file_signs",latest_file_signs)
-    print("latest_file_cars",latest_file_cars)'''
     final_file_list = []
 
     # try to see if any signs/traffic lights or build detected in the images
@@ -262,20 +252,17 @@ def get_bboxes_coords(image):
     try:
         latest_file_signs = glob.glob(str(list_of_file[0] + '*.txt'))
         latest_file_s = max(latest_file_signs, key=os.path.getctime)
-        print("latest file : ", latest_file_s)
-        print("latest file signs : ", latest_file_signs)
+        latest_file_s = change_class(latest_file_s, '2')
         if os.path.exists(str(latest_file_s)):
             file_signs_path = str(latest_file_s)
             final_file_list.append(str(file_signs_path))
     except:
         print("INFORMATION : No traffic sign detected")
         pass
-    # latest_file_cars = glob.glob(str(list_of_file[0] + '/*.txt'))
+
     try:
         latest_file_lane = glob.glob(str(list_of_file[2] + '*.txt'))
-        print("latest file lane : ", latest_file_lane)
         latest_file_la = max(latest_file_lane, key=os.path.getctime)
-        print("latest file : ", latest_file_la)
         if os.path.exists(str(latest_file_la)):
             file_line_path = str(latest_file_la)
             final_file_list.append(file_line_path)
@@ -285,8 +272,7 @@ def get_bboxes_coords(image):
     try:
         latest_file_lights = glob.glob(str(list_of_file[1] + '*.txt'))
         latest_file_l = max(latest_file_lights, key=os.path.getctime)
-        print("latest file : ", latest_file_l)
-        # print("latest file lane : ", latest_file_lights)
+        latest_file_l = change_class(latest_file_l, '1')
         if os.path.exists(str(latest_file_l)):
             file_line_path = str(latest_file_l)
             final_file_list.append(file_line_path)
@@ -302,7 +288,6 @@ def get_bboxes_coords(image):
     final_path = latest_file
     yolo_bbox = final_path
 
-    # pbx.convert_bbox(yolo_bbox1, from_type="yolo", to_type="voc", image_size=(W, H))
     img = cv2.imread(image)
     dh, dw, _ = img.shape
 
@@ -310,23 +295,14 @@ def get_bboxes_coords(image):
     data = fl.readlines()
     fl.close()
 
-    '''data = detect.run(weights="/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/local_test/yolov5/yolov5s.pt",
-                        source=image,
-                      save_conf=True,
-                      save_txt=True)'''
-    # data = demo.detect(weights="/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/PROJET/YOLOPv2/data/weights/yolopv2.pt",source=file_name_image,)
-
     final_coord_list = []
     conf_list = []
-    # conver the yolo coordinates to a normal format
-    for dt in data:
-        # print("data : ", data)
-        # print("dt : ",dt)
-        # Split string to float
-        _, x, y, w, h, conf = map(float, dt.split(' '))
+    class_list = []
 
-        # Taken from https://github.com/pjreddie/darknet/blob/810d7f797bdb2f021dbe65d2524c2ff6b8ab5c8b/src/image.c#L283-L291
-        # via https://stackoverflow.com/questions/44544471/how-to-get-the-coordinates-of-the-bounding-box-in-yolo-object-detection#comment102178409_44592380
+    # convert the yolo coordinates to a normal format
+    for dt in data:
+        # Split string to float
+        class_val, x, y, w, h, conf = map(float, dt.split(' '))
         l = int((x - w / 2) * dw)
         r = int((x + w / 2) * dw)
         t = int((y - h / 2) * dh)
@@ -343,57 +319,90 @@ def get_bboxes_coords(image):
 
         cv2.rectangle(img, (l, t), (r, b), (0, 0, 255), 10)
         final_coord = ([l, t], [r, b])
-        print(f"image : {image}, final_coord : {final_coord}")
         final_coord_list.append(final_coord)
         conf_list.append(conf)
-        # print("final coord : ",type(final_coord))
-    print("final_coord_list : ", final_coord_list)
-    # print("confidence : ", conf_list)
-    return final_coord_list, conf_list
+        class_list.append(class_val)
+    return class_list, final_coord_list, conf_list
 
 
-def file_writer(truck, coords, conf):
-    # projet_path = "/Users/arthurlamard/Documents/Allemagne/cours/AI-PROJECT-SMART_RECORDING_PIPELINE/3d_projection/"
+def file_writer(class_build,truck, coords, conf, corners,cam_stamp):
+    # write all the usefull data in a csv file
     projet_path = "/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/"
     projet_prediction_path = glob.glob(str(projet_path + 'prediction/'))
     file = open(f'{projet_prediction_path[0]}results_pipeline.csv', 'a')
-    file.write(str(truck)+";"+str(coords)+";"+str(conf)+'\n')
-
+    file.write(str(class_build)+","+str(truck)+","+str(coords)+","+str(conf)+","+str(corners)+","+str(cam_stamp)+'\n')
     file.close()
 
+def change_class(file, replacement_value):
+    # function made to change the class of a detetection by the remplacement_value choosen by the user
+    # used to have the same class number for each detection
+    newdata = []
+    fl = open(file, 'r')
+    data = fl.readlines()
+    fl.close()
 
-    '''print("projet prediction path : ", projet_prediction_path)
-    x = coords[0]
-    y = coords[1]
-    z = coords[2]
-    list_line = []
-    line = [truck, coords, conf]
-    list_line.append(line)
-    headerList = ["trucks", "coords", "conf"]
-    print("list_line = ",list_line)
-    with open(f'{projet_prediction_path[0]}results_pipeline.csv', 'a+') as f:
-        f.write(str(list_line[0])+';'+
-                str(list_line[1])+';'+
-                str(list_line[2])+';')
-        f.close()'''
+    for i in range(len(data)):
+        data[i].split(' ')[0] = replacement_value
+        Data  = str(replacement_value + ' ' + data[i].split(' ')[1] + ' '+ data[i].split(' ')[2] + ' ' + data[i].split(' ')[3] + ' ' + data[i].split(' ')[4] + ' ' + data[i].split(' ')[5])
+        newdata.append(Data)
+    f = open(file, 'w')
+    for i in range(len(newdata)):
+        f.write(newdata[i])
+    f.close()
+    return file
 
 
 def anomaly_detection():
+    list_class = []
+    list_conf = []
+    list_coords = []
+    list_time = []
+    list_build = []
+    list_sign = []
+    list_light = []
+    list_corner  = []
+    average = []
     projet_path = "/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/"
     projet_prediction_path = glob.glob(str(projet_path + 'prediction/'))
-    read_file = pd.read_csv((f'{projet_prediction_path[0]}results_pipeline.csv'), names=["trucks", "coords", "conf"])
-    #read_file.to_csv((f'{projet_prediction_path[0]}results_pipeline.csv'))
-    print("header : ", read_file.head())
-    print(read_file)
-    #file = str(projet_prediction_path[0] + 'results_pipeline.csv')
-    #print(pd.read_csv(file))
-    '''list_line = []
-    with open(file, 'r') as f:
-        print("FILE READING ")
-        for line in f.readlines():
-            list_line.append(line)
-            print(list_line)
-        f.close()'''
+    read_file = ((f'{projet_prediction_path[0]}results_pipeline.csv'))
+    with open(read_file) as f:
+        reader = csv.reader(f)
+        for row in reader:
+            # appends in list each element to sepearate them from the original list
+            list_conf.append(row[len(row)-3])
+            list_class.append(row[0])
+            list_coords.append([row[5],row[6],row[7]])
+            list_time.append(row[-1])
+            list_corner.append(row[len(row)-2])
+
+            # get a list of all the specific element
+            if row[0] == '1.0':
+                list_light.append(row)
+            if row[0] == '2.0':
+                list_sign.append(row)
+            if row[0] == '3.0':
+                list_build.append(row)
+                paires = list(zip(list_build, list_build[1:] + list_build[:1]))
+
+
+    #print("paires : ", paires)
+    # start recording if the conf is too low
+    for i in range(len(list_conf)):
+        if list_conf[i]<=str(0.25):
+            print("START RECORDING_conf")
+
+    # start recording id the number of point in the road mask is +/-3 points from the average point of the pipeline
+    # it indicates a special case
+    for i in (list_corner):
+        digit = int(i)
+        average.append(digit)
+        mean = statistics.mean(average)
+        if (int(i)) >= mean+3 or (int(i))<=mean-3:
+            print("START RECORDING_corners")
+    print("list digits : ", average)
+    print("average point : ", statistics.mean(average))
+
+
 
 
 if __name__ == "__main__":
