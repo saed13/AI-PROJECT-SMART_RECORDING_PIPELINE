@@ -147,12 +147,6 @@ def run(
             p = Path(p)  # to Path
             save_path = str(save_dir / p.name)  # im.jpg
             txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # im.txt
-            '''print(f"------ ttx_path DETECT : {txt_path}.txt")
-            if os.path.exists(f'{txt_path}.txt'):
-                try:
-                    os.remove(f'{txt_path}.txt')
-                except OSError as e:
-                    print("Failed with : ", e.strerror)'''
             s += '%gx%g ' % im.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
             imc = im0.copy() if save_crop else im0  # for save_crop
@@ -168,13 +162,11 @@ def run(
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    #TODO : Retirer le dossier labels et pas le fihcier en lui même : permet d'eviter d'écrire alors que les fichiers n'existe pas
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
                         if os.path.exists(f'{txt_path}_conf.txt'):
                             try:
-                                print("COUCOU1")
                                 os.remove(f'{txt_path}_conf.txt')
                             except OSError as e:
                                 print("Failed with : ", e.strerror)
@@ -184,7 +176,7 @@ def run(
                     if save_img or save_crop or view_img:  # Add bbox to image
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
-                        annotator.box_label(xyxy, label, color=colors(c, True))
+                        annotator.box_label(xyxy, label, color=colors(c, False))
                     if save_crop:
                         save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
