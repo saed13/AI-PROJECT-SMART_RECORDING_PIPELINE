@@ -1,4 +1,5 @@
 # AI-PROJECT-SMART_RECORDING_PIPELINE
+![Alt text](img/intro_image.png)
 
 |       Name               |              Major -  Semester           |     Exchange student yes/no  |     Assigned Tasks/Roles  |
 |--------------------------|:----------------------------------------:|:----------------------------:|:-------------------------:|
@@ -53,3 +54,7 @@ Then to run the code, go to the root folder of your project and run the command 
 ```
 python 3d_projection/3d_projection.py
 ```
+
+## The pipeline :
+![Alt text](img/flow_chart.png)
+
