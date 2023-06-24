@@ -18,7 +18,7 @@
 
 If you're facing path issue while running like "the module 'local_test' does not exist" type this command in your terminal to add the project to your python paht :
 ```
-export PYTHONPATH="${PYTHONPATH}:/home/sa13291/Documents/ARTHUR_LAMARD"
+export PYTHONPATH="${PYTHONPATH}:<PATH_TO_YOUR_PROJECT>"
 ```
 
 Your project's data has to have the same tree as the a2d2 dataset tree (example):
