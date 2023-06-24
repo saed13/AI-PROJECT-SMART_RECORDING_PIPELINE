@@ -225,7 +225,6 @@ def run(
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
 
-    print("line_final : ", xywhc)
     return xywhc
 def parse_opt():
     parser = argparse.ArgumentParser()
