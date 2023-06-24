@@ -41,11 +41,11 @@ def make_parser():
     return parser
 
 
-def detect(weights, source, project, save_txt, save_conf, exist_ok):
+def detect(weights, source, project, save_txt, save_conf, exist_ok,conf_thres):
     #global im0, da_seg_mask, ll_seg_mask, im0s, polygon
     xywhc = []
     opt = make_parser().parse_args()
-    print(opt)
+    #print(opt)
     # setting and directories
 
     #source, weights, save_txt, imgsz = opt.source, opt.weights, opt.save_txt, opt.img_size
@@ -101,7 +101,7 @@ def detect(weights, source, project, save_txt, save_conf, exist_ok):
 
         # Apply NMS
         t3 = time_synchronized()
-        pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, classes=opt.classes, agnostic=opt.agnostic_nms)
+        pred = non_max_suppression(pred, conf_thres, opt.iou_thres, classes=opt.classes, agnostic=opt.agnostic_nms)
         t4 = time_synchronized()
 
         da_seg_mask = driving_area_mask(seg)
@@ -118,22 +118,36 @@ def detect(weights, source, project, save_txt, save_conf, exist_ok):
             # cv2.drawContours(im0s, [largest_contour], -1, (0, 0, 0), 2)
             epsilon = 0.01 * cv2.arcLength(largest_contour, True)
             polygon = cv2.approxPolyDP(largest_contour, epsilon, True)
+            
+            # Define the image sizes
+            original_image_width = 1920
+            original_image_height = 1208
+            approx_image_width = 1280
+            approx_image_height = 720
+
+            # Calculate the scaling factors
+            scaling_factor_x = original_image_width / approx_image_width
+            scaling_factor_y = original_image_height / approx_image_height
+
+            # Extract the corner coordinates
+            corners = []
+            for point in polygon:
+                x, y = point[0]
+                # Scale the coordinates
+                scaled_x = int(x * scaling_factor_x)
+                scaled_y = int(y * scaling_factor_y)
+                corners.append((scaled_x, scaled_y))
+
 
             p, s, im0, frame = path, '', im0s, getattr(dataset, 'frame', 0)
 
             p = Path(p)  # to Path
             save_path = str(save_dir / p.name)  # img.jpg
             txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # img.txt
-            print("------ ttx_path DEMO : ", txt_path)
-            print("********* EXIST : ",os.path.exists(str(txt_path + '.txt')))
-            print("list directory : ", os.listdir('/home/sa13291/Documents/ARTHUR_LAMARD/3d_projection/prediction/prediction_lane/exp/labels'))
             if os.path.exists(str(txt_path + '_conf.txt')):
-                print("FILE EXIST")
+                #print("FILE EXIST")
                 try:
                     os.remove(f'{txt_path}_conf.txt')
-                    print("COUCOU2")
-                    print(f"file{txt_path}.txt deleted")
-                    print("list directory : ", os.listdir('../txt_path'))
                 except OSError as e:
                     print("Failed with : ", e.strerror)
             s += '%gx%g ' % img.shape[2:]  # print string
@@ -159,7 +173,7 @@ def detect(weights, source, project, save_txt, save_conf, exist_ok):
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if save_img:  # Add bbox to image
-                        plot_one_box(xyxy, im0, line_thickness=3)
+                        plot_one_box(xyxy, im0, line_thickness=3, color='b')
                 xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                 line = (cls, *xywh, conf)
                 final = (('%g ' * len(line)).rstrip() % line)
@@ -198,7 +212,7 @@ def detect(weights, source, project, save_txt, save_conf, exist_ok):
     print(f'Done. ({time.time() - t0:.3f}s)')
 
     #print("°°°°°°°°°°°°°°°°°°°°°°xywhc : ", xywhc)
-    return xywhc, im0, da_seg_mask, ll_seg_mask, im0s, polygon
+    return xywhc, im0, da_seg_mask, ll_seg_mask, im0s, polygon, corners
 
 
 if __name__ == '__main__':
