@@ -58,7 +58,7 @@ python 3d_projection/3d_projection.py
 ## The pipeline :
 ![Alt text](img/flow_chart.png)
 
-## Author
+## Author of the README.md file 
 [Arthur Lamard](https://github.com/Micropot)
 
 
