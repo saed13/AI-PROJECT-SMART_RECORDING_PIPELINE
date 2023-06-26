@@ -41,12 +41,13 @@ Inside each cam_front_semantic_bboxes files you'll find specific files from the 
 ## To run the code  :
 ### WARNING : Do not forget to change the paths in the 3d_detection file
 version of python : 3.10.11
-
+#### CONDA
 To create an environnement with conda please use the command : 
 ```
 conda create --name <env> --file requirement_CONDA.txt python=3.10.11
 ```
-To create an environnement with pip please use the command : 
+#### VENV
+After creating your venv envrionement, you can install the packages with pip please use the command : 
 ```
 pip install -r requirements_pip.txt
 ```
