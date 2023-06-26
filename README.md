@@ -61,6 +61,9 @@ Then to run the code, go to the root folder of your project and run the command 
 python 3d_projection/3d_projection.py
 ```
 
+## Models : 
+YOLOPv2 weights are downloadable [here](https://github.com/CAIC-AD/YOLOPv2/releases/download/V0.0.1/yolopv2.pt).
+
 ## The pipeline :
 ![Alt text](img/flow_chart.png)
 
