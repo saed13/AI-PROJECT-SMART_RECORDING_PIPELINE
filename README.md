@@ -44,7 +44,7 @@ version of python : 3.10.11
 
 To create an environnement with conda please use the command : 
 ```
-conda create --name <env> --file requirements_conda.txt
+conda create --name <env> --file requirement_CONDA.txt python=3.10.11
 ```
 To create an environnement with pip please use the command : 
 ```
