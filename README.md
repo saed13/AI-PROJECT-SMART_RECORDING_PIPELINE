@@ -46,6 +46,11 @@ To create an environnement with conda please use the command :
 ```
 conda create --name <env> --file requirement_CONDA.txt python=3.10.11
 ```
+If you're facing issues with the requirement.txt file, you can try to use the yml file running this command :
+```
+conda env create -f environment_conda.yml
+```
+
 #### VENV
 After creating your venv envrionement, you can install the packages with pip please use the command : 
 ```
