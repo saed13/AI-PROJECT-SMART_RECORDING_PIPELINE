@@ -1,18 +1,6 @@
 # AI-PROJECT-SMART_RECORDING_PIPELINE
 ![Alt text](img/intro_image.png)
 
-|       Name               |              Major -  Semester           |     Exchange student yes/no  |     Assigned Tasks/Roles  |
-|--------------------------|:----------------------------------------:|:----------------------------:|:-------------------------:|
-|     Roxana Buder         |   AI 6                                   |   no                         |                           |
-|     Lamard Arthur        |   ICS                                    |   yes                        |                           |
-|     Sanamjeet Meyer      |   AI 6                                   |   no                         |                           |
-|     Serife-Nur  Özdemir  |   AI 6                                   |   no                         |                           |
-|     Shpineva Polina      |   ICS                                    |   yes                        |                           |
-|     Kostennikov Danil    |   ICS                                    |   yes                        |                           |
-|     Saed Abed            |   AI-6                                   |   no                         |                           |
-|     Javier Górriz        |   ICS                                    |   yes                        |                           |
-|     Roberto Rivas        |   ICS                                    |   yes                        |                           |
-|     Alexander Shunyaev   |   ICS                                    |   yes                        |                           |
 
 
 ## How to use the code ? 
@@ -67,7 +55,6 @@ YOLOPv2 weights are downloadable [here](https://github.com/CAIC-AD/YOLOPv2/relea
 ## The pipeline :
 ![Alt text](img/flow_chart.png)
 
-## Author of the README.md file 
-[Arthur Lamard](https://github.com/Micropot)
+
 
 
